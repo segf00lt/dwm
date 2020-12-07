@@ -2,6 +2,7 @@
 
 /* appearance */
 static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int gappx     = 8;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -11,7 +12,7 @@ static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#932c2f";
+static const char col_cyan[]        = "#9d0006";
 //static const char col_cyan[]        = "#005577";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
@@ -41,7 +42,7 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 
 /* Bartabgroups properties */
 #define BARTAB_BORDERS 1       // 0 = off, 1 = on
-#define BARTAB_BOTTOMBORDER 1  // 0 = off, 1 = on
+#define BARTAB_BOTTOMBORDER 0  // 0 = off, 1 = on
 #define BARTAB_TAGSINDICATOR 1 // 0 = off, 1 = on if >1 client/view tag, 2 = always on
 #define BARTAB_TAGSPX 5        // # pixels for tag grid boxes
 #define BARTAB_TAGSROWS 3      // # rows in tag grid (9 tags, e.g. 3x3)
@@ -97,6 +98,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,                       XK_minus,  setgaps,        {.i = -1 } },
+	{ MODKEY,                       XK_equal,  setgaps,        {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
         { MODKEY,                       XK_o,      shiftview,      {.i = +1 } },
         { MODKEY,                       XK_i,      shiftview,      {.i = -1 } },
  	TAGKEYS(                        XK_1,                      0)
