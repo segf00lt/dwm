@@ -1,21 +1,21 @@
-#Patches
+# Patches
 
-- ***actualfullscreen***
+- **actualfullscreen**
 
-- ***attachtop***
+- **attachtop**
 
-- ***autostart***
+- **autostart**
 
-- ***bartabgroups***
+- **bartabgroups**
 
-- ***taggrid***
+- **taggrid**
 
-- ***focusonclick***
+- **focusonclick**
 
-- ***movestack***
+- **movestack**
 
-- ***pertag***
+- **pertag**
 
-- ***vanitygaps***
+- **vanitygaps**
 
-- ***xrdb***
+- **xrdb**
