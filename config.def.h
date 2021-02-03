@@ -67,9 +67,9 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 /* Bartabgroups properties */
 #define BARTAB_BORDERS 0       // 0 = off, 1 = on
 #define BARTAB_BOTTOMBORDER 0  // 0 = off, 1 = on
-#define BARTAB_TAGSINDICATOR 1 // 0 = off, 1 = on if >1 client/view tag, 2 = always on
-#define BARTAB_TAGSPX 5        // # pixels for tag grid boxes
-#define BARTAB_TAGSROWS 3      // # rows in tag grid (9 tags, e.g. 3x3)
+#define BARTAB_TAGSINDICATOR 0 // 0 = off, 1 = on if >1 client/view tag, 2 = always on
+#define BARTAB_TAGSPX 8        // # pixels for tag grid boxes
+#define BARTAB_TAGSROWS 1      // # rows in tag grid (9 tags, e.g. 3x3)
 static void (*bartabmonfns[])(Monitor *) = { monocle /* , customlayoutfn */ };
 static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
@@ -107,13 +107,22 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { "st", NULL };
+static const char *browsercmd[]  = { "qutebrowser", NULL };
+static const char *filemancmd[]  = { "st", "ranger", NULL };
 
 #include "movestack.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
+	{ MODKEY,                       XK_f,      spawn,          {.v = filemancmd } },
+	{ Mod1Mask,                     XK_space,  spawn,          SHCMD("keymapswitch") },
+	{ Mod1Mask,                     XK_F1,     spawn,          SHCMD("volumeset tog") },
+	{ Mod1Mask,                     XK_F2,     spawn,          SHCMD("volumeset less") },
+	{ Mod1Mask,                     XK_F3,     spawn,          SHCMD("volumeset more") },
+	{ Mod1Mask|ShiftMask,           XK_F3,     spawn,          SHCMD("volumeset max") },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
