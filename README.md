@@ -19,3 +19,5 @@
 - **vanitygaps**
 
 - **xrdb**
+
+- **fixborders**
