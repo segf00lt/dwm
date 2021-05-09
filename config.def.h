@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 7;       /* horiz inner gap between windows */
 static const unsigned int gappiv    = 7;       /* vert inner gap between windows */
@@ -109,6 +109,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "qutebrowser", NULL };
 static const char *filemancmd[]  = { "st", "ranger", NULL };
+static const char *newsboatcmd[]  = { "st", "newsboat", NULL };
 
 #include "movestack.c"
 static Key keys[] = {
@@ -116,11 +117,14 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_f,      spawn,          {.v = filemancmd } },
-	{ Mod1Mask,                     XK_space,  spawn,          SHCMD("keymapswitch") },
+	{ MODKEY,                       XK_n,      spawn,          {.v = newsboatcmd } },
+	{ MODKEY,                     	XK_space,  spawn,          SHCMD("keymapswitch") },
 	{ Mod1Mask,                     XK_F1,     spawn,          SHCMD("pamixer --toggle-mute; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask,                     XK_F2,     spawn,          SHCMD("pamixer --decrease 5; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask,                     XK_F3,     spawn,          SHCMD("pamixer --increase 5; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask|ShiftMask,           XK_F3,     spawn,          SHCMD("pamixer --set-volume 100; kill -49 $(pidof dwmblocks)") },
+	{ Mod1Mask,                     XK_Print,  spawn,          SHCMD("scrot") },
+	{ Mod1Mask,           		XK_s,  	   spawn,          SHCMD("scrot -s") },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
