@@ -21,3 +21,5 @@
 - **xrdb**
 
 - **fixborders**
+
+- **focusmaster**

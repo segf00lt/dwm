@@ -13,11 +13,11 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int focusonwheel       = 0;
 static const char *fonts[]          = { "monospace:size=11" };
 static const char dmenufont[]       = "monospace:size=11";
-static char normbgcolor[]           = "#222222";
-static char normbordercolor[]       = "#444444";
-static char normfgcolor[]           = "#bbbbbb";
-static char selfgcolor[]            = "#eeeeee";
-static char selbordercolor[]        = "#005577";
+static char normbgcolor[]           = "#000000";
+static char normbordercolor[]       = "#555753";
+static char normfgcolor[]           = "#d3d7cf";
+static char selfgcolor[]            = "#fce94f";
+static char selbordercolor[]        = "#555753";
 static char selbgcolor[]            = "#005577";
 static char *colors[][3] = {
 	/*               fg         bg         border   */
@@ -125,6 +125,8 @@ static Key keys[] = {
 	{ Mod1Mask|ShiftMask,           XK_F3,     spawn,          SHCMD("pamixer --set-volume 100; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask,                     XK_Print,  spawn,          SHCMD("scrot") },
 	{ Mod1Mask,           		XK_s,  	   spawn,          SHCMD("scrot -s") },
+	{ MODKEY|ShiftMask,           	XK_p,  	   spawn,          SHCMD("shutdown now") },
+	{ MODKEY|ShiftMask,           	XK_r,  	   spawn,          SHCMD("reboot") },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
