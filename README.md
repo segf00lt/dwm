@@ -23,3 +23,9 @@
 - **fixborders**
 
 - **focusmaster**
+
+# TODO
+
+- Add pango, hidevacanttags, stackmfact and custom shiftview patch.
+
+- Remove taggrid, xrdb, focusmaster.
