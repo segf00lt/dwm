@@ -66,9 +66,10 @@ static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
+	{ "D[]",      deck },	/* first entry is default */
+	{ "[]=",      tile },    
 	{ "[M]",      monocle },
-	{ "D[]",      deck },
+	{ "[]=",      tile },
 	{ "TTT",      bstack },
 	{ "B[]",      bstackdeck },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
@@ -91,16 +92,12 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "qutebrowser", NULL };
-static const char *filemancmd[]  = { "st", "lf", NULL };
-static const char *newsboatcmd[]  = { "st", "newsboat", NULL };
 
 #include "movestack.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
-	{ MODKEY,                       XK_f,      spawn,          {.v = filemancmd } },
-	{ MODKEY,                       XK_n,      spawn,          {.v = newsboatcmd } },
 	{ MODKEY,                     	XK_space,  spawn,          SHCMD("keymapswitch") },
 	{ Mod1Mask,                     XK_F1,     spawn,          SHCMD("pamixer --toggle-mute; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask,                     XK_F2,     spawn,          SHCMD("pamixer --decrease 2; kill -49 $(pidof dwmblocks)") },
@@ -127,9 +124,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Tab,    zoom,           {0} },
 	//{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_BackSpace,killclient,   {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
+	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_s,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_u,      setlayout,      {.v = &layouts[4]} },
 	{ MODKEY|ShiftMask,             XK_equal,  togglegaps,     {0} },
