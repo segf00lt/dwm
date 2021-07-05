@@ -1,31 +1,28 @@
 # Patches
 
-- **actualfullscreen**
+- [actualfullscreen](https://dwm.suckless.org/patches/actualfullscreen/)
 
-- **attachtop**
+- [attachtop](https://dwm.suckless.org/patches/attachtop/)
 
-- **autostart**
+- [autostart](https://dwm.suckless.org/patches/autostart/dwm-autostart-20210120-cb3f58a.diff)
 
-- **bartabgroups**
+- [bartabgroups](https://dwm.suckless.org/patches/bartabgroups/)
 
-- **taggrid**
+- [focusonclick](https://dwm.suckless.org/patches/focusonclick/dwm-focusonclick-20200110-61bb8b2.diff)
 
-- **focusonclick**
+- [movestack](https://dwm.suckless.org/patches/movestack/dwm-movestack-6.1.diff)
 
-- **movestack**
+- [pertag](https://dwm.suckless.org/patches/pertag/dwm-pertag-6.2.diff)
 
-- **pertag**
+- [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/dwm-vanitygaps-6.2.diff)
 
-- **vanitygaps**
+- fixborders
 
-- **xrdb**
+- [hidevacanttags](https://dwm.suckless.org/patches/hide_vacant_tags/dwm-hide_vacant_tags-6.2.diff)
 
-- **fixborders**
-
-- **focusmaster**
+- [shiftview](https://github.com/segf00lt/shiftview)
 
 # TODO
 
-- Add pango, hidevacanttags, stackmfact and custom shiftview patch.
-
-- Remove taggrid, xrdb, focusmaster.
+- Apply stackmfact to all layouts.
+- Create patch to circularly move contents of tags left or right.

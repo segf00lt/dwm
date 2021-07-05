@@ -35,7 +35,6 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
-#include <X11/Xresource.h>
 #include <X11/Xutil.h>
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
@@ -58,21 +57,6 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define XRDB_LOAD_COLOR(R,V)    if (XrmGetResource(xrdb, R, NULL, &type, &value) == True) { \
-                                  if (value.addr != NULL && strnlen(value.addr, 8) == 7 && value.addr[0] == '#') { \
-                                    int i = 1; \
-                                    for (; i <= 6; i++) { \
-                                      if (value.addr[i] < 48) break; \
-                                      if (value.addr[i] > 57 && value.addr[i] < 65) break; \
-                                      if (value.addr[i] > 70 && value.addr[i] < 97) break; \
-                                      if (value.addr[i] > 102) break; \
-                                    } \
-                                    if (i == 7) { \
-                                      strncpy(V, value.addr, 7); \
-                                      V[7] = '\0'; \
-                                    } \
-                                  } \
-                                }
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
@@ -187,7 +171,6 @@ static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
-static void drawtaggrid(Monitor *m, int *x_pos, unsigned int occ);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focusin(XEvent *e);
@@ -201,7 +184,6 @@ static void grabkeys(void);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
-static void loadxrdb(void);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
@@ -231,7 +213,6 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
-static void switchtag(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void togglebar(const Arg *arg);
@@ -258,9 +239,7 @@ static Monitor *wintomon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
-static void xrdb(const Arg *arg);
 static void zoom(const Arg *arg);
-static void focusmaster(const Arg *arg);
 
 /* variables */
 static const char broken[] = "broken";
@@ -562,14 +541,12 @@ attachstack(Client *c)
 void
 buttonpress(XEvent *e)
 {
-	unsigned int i, x, click;
-	unsigned int columns;
+	unsigned int i, x, click, occ = 0;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
 	XButtonPressedEvent *ev = &e->xbutton;
 
-	columns = LENGTH(tags) / tagrows + ((LENGTH(tags) % tagrows > 0) ? 1 : 0);
 	click = ClkRootWin;
 	/* focus monitor if necessary */
 	if ((m = wintomon(ev->window)) && m != selmon
@@ -580,23 +557,18 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		if (drawtagmask & DRAWCLASSICTAGS)
-		do
+		for (c = m->clients; c; c = c->next)
+			occ |= c->tags == 255 ? 0 : c->tags;
+		do {
+			/* do not reserve space for vacant tags */
+			if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+				continue;
 			x += TEXTW(tags[i]);
-		while (ev->x >= x && ++i < LENGTH(tags));
-		if(i < LENGTH(tags) && (drawtagmask & DRAWCLASSICTAGS)) {
+		} while (ev->x >= x && ++i < LENGTH(tags));
+		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
-		} else if(ev->x < x + columns * bh / tagrows && (drawtagmask & DRAWTAGGRID)) {
-			click = ClkTagBar;
-			i = (ev->x - x) / (bh / tagrows);
-			i = i + columns * (ev->y / (bh / tagrows));
-			if (i >= LENGTH(tags)) {
-				i = LENGTH(tags) - 1;
-			}
-			arg.ui = 1 << i;
-		}
-		else if(ev->x < x + blw + columns * bh / tagrows)
+		} else if (ev->x < x + blw)
 			click = ClkLtSymbol;
 		else if (ev->x > selmon->ww - TEXTW(stext))
 			click = ClkStatusText;
@@ -887,13 +859,16 @@ drawbar(Monitor *m)
 	}
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags;
+		occ |= c->tags == 255 ? 0 : c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
 	}
 	x = 0;
-	if (drawtagmask & DRAWCLASSICTAGS)
 	for (i = 0; i < LENGTH(tags); i++) {
+		/* do not draw vacant tags */
+		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		continue;
+
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
@@ -902,9 +877,6 @@ drawbar(Monitor *m)
 				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
 				urg & 1 << i);
 		x += w;
-	}
-	if (drawtagmask & DRAWTAGGRID) {
-		drawtaggrid(m,&x,occ);
 	}
 	w = blw = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
@@ -929,49 +901,6 @@ drawbars(void)
 
 	for (m = mons; m; m = m->next)
 		drawbar(m);
-}
-
-void drawtaggrid(Monitor *m, int *x_pos, unsigned int occ)
-{
-    unsigned int x, y, h, max_x, columns;
-    int invert, i,j, k;
-
-    h = bh / tagrows;
-    x = max_x = *x_pos;
-    y = 0;
-    columns = LENGTH(tags) / tagrows + ((LENGTH(tags) % tagrows > 0) ? 1 : 0);
-
-    /* Firstly we will fill the borders of squares */
-
-    XSetForeground(drw->dpy, drw->gc, scheme[SchemeNorm][ColBorder].pixel);
-    XFillRectangle(dpy, drw->drawable, drw->gc, x, y, h*columns + 1, bh);
-
-    /* We will draw LENGTH(tags) squares in tagraws raws. */
-	for(j = 0,  i= 0; j < tagrows; j++) {
-        x = *x_pos;
-        for (k = 0; k < columns && i < LENGTH(tags); k++, i++) {
-		    invert = m->tagset[m->seltags] & 1 << i ? 0 : 1;
-
-            /* Select active color for current square */
-            XSetForeground(drw->dpy, drw->gc, !invert ? scheme[SchemeSel][ColBg].pixel :
-                                scheme[SchemeNorm][ColFg].pixel);
-            XFillRectangle(dpy, drw->drawable, drw->gc, x+1, y+1, h-1, h-1);
-
-            /* Mark square if tag has client */
-            if (occ & 1 << i) {
-                XSetForeground(drw->dpy, drw->gc, !invert ? scheme[SchemeSel][ColFg].pixel :
-                                scheme[SchemeNorm][ColBg].pixel);
-                XFillRectangle(dpy, drw->drawable, drw->gc, x + 1, y + 1,
-                               h / 2, h / 2);
-            }
-		    x += h;
-            if (x > max_x) {
-                max_x = x;
-            }
-        }
-        y += h;
-	}
-    *x_pos = max_x + 1;
 }
 
 void
@@ -1217,38 +1146,6 @@ killclient(const Arg *arg)
 		XUngrabServer(dpy);
 	}
 }
-
-void
-loadxrdb()
-{
-  Display *display;
-  char * resm;
-  XrmDatabase xrdb;
-  char *type;
-  XrmValue value;
-
-  display = XOpenDisplay(NULL);
-
-  if (display != NULL) {
-    resm = XResourceManagerString(display);
-
-    if (resm != NULL) {
-      xrdb = XrmGetStringDatabase(resm);
-
-      if (xrdb != NULL) {
-        XRDB_LOAD_COLOR("dwm.normbordercolor", normbordercolor);
-        XRDB_LOAD_COLOR("dwm.normbgcolor", normbgcolor);
-        XRDB_LOAD_COLOR("dwm.normfgcolor", normfgcolor);
-        XRDB_LOAD_COLOR("dwm.selbordercolor", selbordercolor);
-        XRDB_LOAD_COLOR("dwm.selbgcolor", selbgcolor);
-        XRDB_LOAD_COLOR("dwm.selfgcolor", selfgcolor);
-      }
-    }
-  }
-
-  XCloseDisplay(display);
-}
-
 void
 manage(Window w, XWindowAttributes *wa)
 {
@@ -1852,82 +1749,6 @@ showhide(Client *c)
 	}
 }
 
-void switchtag(const Arg *arg)
-{
-    unsigned int columns;
-    unsigned int new_tagset = 0;
-    unsigned int pos, i;
-    int col, row;
-    Arg new_arg;
-
-    columns = LENGTH(tags) / tagrows + ((LENGTH(tags) % tagrows > 0) ? 1 : 0);
-
-    for (i = 0; i < LENGTH(tags); ++i) {
-        if (!(selmon->tagset[selmon->seltags] & 1 << i)) {
-            continue;
-        }
-        pos = i;
-        row = pos / columns;
-        col = pos % columns;
-        if (arg->ui & SWITCHTAG_UP) {     /* UP */
-            row --;
-            if (row < 0) {
-                row = tagrows - 1;
-            }
-            do {
-                pos = row * columns + col;
-                row --;
-            } while (pos >= LENGTH(tags));
-        }
-        if (arg->ui & SWITCHTAG_DOWN) {     /* DOWN */
-            row ++;
-            if (row >= tagrows) {
-                row = 0;
-            }
-            pos = row * columns + col;
-            if (pos >= LENGTH(tags)) {
-                row = 0;
-            }
-            pos = row * columns + col;
-        }
-        if (arg->ui & SWITCHTAG_LEFT) {     /* LEFT */
-            col --;
-            if (col < 0) {
-                col = columns - 1;
-            }
-            do {
-                pos = row * columns + col;
-                col --;
-            } while (pos >= LENGTH(tags));
-        }
-        if (arg->ui & SWITCHTAG_RIGHT) {     /* RIGHT */
-            col ++;
-            if (col >= columns) {
-                col = 0;
-            }
-            pos = row * columns + col;
-            if (pos >= LENGTH(tags)) {
-                col = 0;
-                pos = row * columns + col;
-            }
-        }
-        new_tagset |= 1 << pos;
-    }
-    new_arg.ui = new_tagset;
-    if (arg->ui & SWITCHTAG_TOGGLETAG) {
-        toggletag(&new_arg);
-    }
-    if (arg->ui & SWITCHTAG_TAG) {
-        tag(&new_arg);
-    }
-    if (arg->ui & SWITCHTAG_VIEW) {
-        view (&new_arg);
-    }
-    if (arg->ui & SWITCHTAG_TOGGLEVIEW) {
-        toggleview (&new_arg);
-    }
-}
-
 void
 sigchld(int unused)
 {
@@ -2442,17 +2263,6 @@ xerrorstart(Display *dpy, XErrorEvent *ee)
 }
 
 void
-xrdb(const Arg *arg)
-{
-  loadxrdb();
-  int i;
-  for (i = 0; i < LENGTH(colors); i++)
-                scheme[i] = drw_scm_create(drw, colors[i], 3);
-  focus(NULL);
-  arrange(NULL);
-}
-
-void
 zoom(const Arg *arg)
 {
 	Client *c = selmon->sel;
@@ -2464,18 +2274,6 @@ zoom(const Arg *arg)
 		if (!c || !(c = nexttiled(c->next)))
 			return;
 	pop(c);
-}
-
-void
-focusmaster(const Arg *arg)
-{
-	Client *c;
-	if (selmon->nmaster < 1)
-		return;
-
-	c = nexttiled(selmon->clients);
-	if (c)
-		focus(c);
 }
 
 int
@@ -2490,8 +2288,6 @@ main(int argc, char *argv[])
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("dwm: cannot open display");
 	checkotherwm();
-        XrmInitialize();
-        loadxrdb();
 	setup();
 #ifdef __OpenBSD__
 	if (pledge("stdio rpath proc exec", NULL) == -1)

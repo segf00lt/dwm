@@ -3,6 +3,7 @@
 *.diff
 *.rej
 *.orig
+*.o
 
 # Executables
 dwm

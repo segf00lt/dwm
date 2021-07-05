@@ -13,13 +13,13 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int focusonwheel       = 0;
 static const char *fonts[]          = { "monospace:size=11" };
 static const char dmenufont[]       = "monospace:size=11";
-static char normbgcolor[]           = "#000000";
-static char normbordercolor[]       = "#555753";
-static char normfgcolor[]           = "#d3d7cf";
-static char selfgcolor[]            = "#fce94f";
-static char selbordercolor[]        = "#555753";
-static char selbgcolor[]            = "#005577";
-static char *colors[][3] = {
+static const char normbgcolor[]           = "#000000";
+static const char normbordercolor[]       = "#555753";
+static const char normfgcolor[]           = "#d3d7cf";
+static const char selfgcolor[]            = "#fce94f";
+static const char selbordercolor[]        = "#cc0000";
+static const char selbgcolor[]            = "#555753";
+static const char *colors[][3] = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
 	[SchemeSel]  = { selfgcolor, selbgcolor,  selbordercolor  },
@@ -30,29 +30,13 @@ static char *colors[][3] = {
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-/* grid of tags */
-#define DRAWCLASSICTAGS             1 << 0
-#define DRAWTAGGRID                 1 << 1
-
-#define SWITCHTAG_UP                1 << 0
-#define SWITCHTAG_DOWN              1 << 1
-#define SWITCHTAG_LEFT              1 << 2
-#define SWITCHTAG_RIGHT             1 << 3
-#define SWITCHTAG_TOGGLETAG         1 << 4
-#define SWITCHTAG_TAG               1 << 5
-#define SWITCHTAG_VIEW              1 << 6
-#define SWITCHTAG_TOGGLEVIEW        1 << 7
-
-static const unsigned int drawtagmask = DRAWCLASSICTAGS; /* | DRAWCLASSICTAGS to show classic row of tags */
-static const int tagrows = 1;
-
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
+	{ "Gimp",     NULL,       NULL,       0,            0,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
@@ -73,21 +57,20 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 static void (*bartabmonfns[])(Monitor *) = { monocle /* , customlayoutfn */ };
 static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
+// shiftview
+#define SHIFT_LEFT              1 << 0
+#define SHIFT_RIGHT             1 << 1
+#define SHIFT_TAG		1 << 2
+#define SHIFT_VIEW		1 << 3
+#include "shiftview.c"
+
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
 	{ "[M]",      monocle },
-	{ "[@]",      spiral },
-	{ "[\\]",     dwindle },
 	{ "D[]",      deck },
 	{ "TTT",      bstack },
-	{ "===",      bstackhoriz },
-	{ "HHH",      grid },
-	{ "###",      nrowgrid },
-	{ "---",      horizgrid },
-	{ ":::",      gaplessgrid },
-	{ "|M|",      centeredmaster },
-	{ ">M>",      centeredfloatingmaster },
+	{ "B[]",      bstackdeck },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ NULL,       NULL },
 };
@@ -108,7 +91,7 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon };
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "qutebrowser", NULL };
-static const char *filemancmd[]  = { "st", "ranger", NULL };
+static const char *filemancmd[]  = { "st", "lf", NULL };
 static const char *newsboatcmd[]  = { "st", "newsboat", NULL };
 
 #include "movestack.c"
@@ -120,9 +103,13 @@ static Key keys[] = {
 	{ MODKEY,                       XK_n,      spawn,          {.v = newsboatcmd } },
 	{ MODKEY,                     	XK_space,  spawn,          SHCMD("keymapswitch") },
 	{ Mod1Mask,                     XK_F1,     spawn,          SHCMD("pamixer --toggle-mute; kill -49 $(pidof dwmblocks)") },
-	{ Mod1Mask,                     XK_F2,     spawn,          SHCMD("pamixer --decrease 5; kill -49 $(pidof dwmblocks)") },
-	{ Mod1Mask,                     XK_F3,     spawn,          SHCMD("pamixer --increase 5; kill -49 $(pidof dwmblocks)") },
+	{ Mod1Mask,                     XK_F2,     spawn,          SHCMD("pamixer --decrease 2; kill -49 $(pidof dwmblocks)") },
+	{ Mod1Mask,                     XK_F3,     spawn,          SHCMD("pamixer --increase 2; kill -49 $(pidof dwmblocks)") },
 	{ Mod1Mask|ShiftMask,           XK_F3,     spawn,          SHCMD("pamixer --set-volume 100; kill -49 $(pidof dwmblocks)") },
+	{ Mod1Mask,           		XK_F6,     spawn,          SHCMD("mpc toggle") },
+	{ Mod1Mask|ShiftMask,           XK_F6,     spawn,          SHCMD("mpc stop") },
+	{ Mod1Mask,           		XK_F5,     spawn,          SHCMD("mpc prev") },
+	{ Mod1Mask,           		XK_F7,     spawn,          SHCMD("mpc next") },
 	{ Mod1Mask,                     XK_Print,  spawn,          SHCMD("scrot") },
 	{ Mod1Mask,           		XK_s,  	   spawn,          SHCMD("scrot -s") },
 	{ MODKEY|ShiftMask,           	XK_p,  	   spawn,          SHCMD("shutdown now") },
@@ -131,7 +118,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_semicolon,focusmaster,  {0} },
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_equal,  incnmaster,     {.i = +1 } },
@@ -143,12 +129,10 @@ static Key keys[] = {
 	{ MODKEY,                       XK_BackSpace,killclient,   {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[4]} },
-	{ MODKEY,                       XK_s,      setlayout,      {.v = &layouts[5]} },
-	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[7]} },
+	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_s,      setlayout,      {.v = &layouts[3]} },
+	{ MODKEY,                       XK_u,      setlayout,      {.v = &layouts[4]} },
 	{ MODKEY|ShiftMask,             XK_equal,  togglegaps,     {0} },
-	//{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	//{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -157,7 +141,10 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+	{ MODKEY,           		XK_o,  shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
+	{ MODKEY,           		XK_i,   shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_o,  shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_i,   shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -168,16 +155,6 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
-
-    //{ MODKEY,           XK_Up,     switchtag,      { .ui = SWITCHTAG_UP     | SWITCHTAG_VIEW } },
-    //{ MODKEY,           XK_Down,   switchtag,      { .ui = SWITCHTAG_DOWN   | SWITCHTAG_VIEW } },
-    { MODKEY,           XK_o,  switchtag,      { .ui = SWITCHTAG_RIGHT  | SWITCHTAG_VIEW } },
-    { MODKEY,           XK_i,   switchtag,      { .ui = SWITCHTAG_LEFT   | SWITCHTAG_VIEW } },
-
-    //{ MODKEY|ShiftMask,              XK_Up,     switchtag,      { .ui = SWITCHTAG_UP     | SWITCHTAG_TAG | SWITCHTAG_VIEW } },
-    //{ MODKEY|ShiftMask,              XK_Down,   switchtag,      { .ui = SWITCHTAG_DOWN   | SWITCHTAG_TAG | SWITCHTAG_VIEW } },
-    { MODKEY|ShiftMask,              XK_o,  switchtag,      { .ui = SWITCHTAG_RIGHT  | SWITCHTAG_TAG | SWITCHTAG_VIEW } },
-    { MODKEY|ShiftMask,              XK_i,   switchtag,      { .ui = SWITCHTAG_LEFT   | SWITCHTAG_TAG | SWITCHTAG_VIEW } },
 };
 
 /* button definitions */
