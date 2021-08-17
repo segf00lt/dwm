@@ -15,10 +15,10 @@ static const char *fonts[]          = { "monospace:size=11" };
 static const char dmenufont[]       = "monospace:size=11";
 static const char normbgcolor[]           = "#333333";
 static const char normbordercolor[]       = "#333333";
-static const char normfgcolor[]           = "#d3d7cf";
+static const char normfgcolor[]           = "#cccccc";
 static const char selfgcolor[]            = "#ffffff";
 static const char selbordercolor[]        = "#ffffff";
-static const char selbgcolor[]            = "#555753";
+static const char selbgcolor[]            = "#555555";
 static const char *colors[][3] = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
