@@ -13,8 +13,8 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int focusonwheel       = 0;
 static const char *fonts[]          = { "monospace:size=11" };
 static const char dmenufont[]       = "monospace:size=11";
-static const char normbgcolor[]           = "#000000";
-static const char normbordercolor[]       = "#555753";
+static const char normbgcolor[]           = "#333333";
+static const char normbordercolor[]       = "#333333";
 static const char normfgcolor[]           = "#d3d7cf";
 static const char selfgcolor[]            = "#ffffff";
 static const char selbordercolor[]        = "#ffffff";
