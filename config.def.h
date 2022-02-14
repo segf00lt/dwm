@@ -137,10 +137,10 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,           		XK_o,  shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
-	{ MODKEY,           		XK_i,   shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_o,  shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_i,   shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY,           		XK_o,  	   shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
+	{ MODKEY,           		XK_i,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_o,      shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_i,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
