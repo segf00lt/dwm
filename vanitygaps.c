@@ -1,10 +1,13 @@
 /* Key binding functions */
 static void togglegaps(const Arg *arg);
+
 /* Layouts (delete the ones you do not need) */
 static void bstackdeck(Monitor *m);
 static void bstack(Monitor *m);
 static void deck(Monitor *m);
 static void tile(Monitor *m);
+static void monocle(Monitor *m);
+
 /* Internals */
 static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc);
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
@@ -251,3 +254,31 @@ tile(Monitor *m)
 		}
 }
 
+/*
+ * Default monocle layout + gaps
+ */
+void
+monocle(Monitor *m)
+{
+	unsigned int n = 0;
+	int oh, ov, ih, iv;
+	int x = 0, y = 0, w = 0, h = 0;
+	Client *c;
+
+	getgaps(m, &oh, &ov, &ih, &iv, &n);
+	if (n == 0)
+		return;
+
+	x = m->wx + ov;
+	y = m->wy + oh;
+	w = m->ww - 2*oh;
+	h = m->wh - 2*oh;
+
+	for (c = m->clients; c; c = c->next)
+		if (ISVISIBLE(c))
+			n++;
+	if (n > 0) /* override layout symbol */
+		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
+	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
+		resize(c, x, y, w - 2*c->bw, h - 2*c->bw, 0);
+}

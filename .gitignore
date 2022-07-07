@@ -7,3 +7,7 @@
 
 # Executables
 dwm
+
+# misc
+tags
+*.vim
