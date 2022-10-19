@@ -14,7 +14,7 @@ static const int focusonwheel       = 0;
 static const char *fonts[]          = { "monospace:size=11" };
 static const char dmenufont[]       = "monospace:size=11";
 static const char normbgcolor[]           = "#333333";
-static const char normbordercolor[]       = "#333333";
+static const char normbordercolor[]       = "#555555";
 static const char normfgcolor[]           = "#cccccc";
 static const char selfgcolor[]            = "#ffffff";
 static const char selbordercolor[]        = "#ffffff";
@@ -45,7 +45,6 @@ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
-#define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 
 /* Bartabgroups properties */
@@ -106,8 +105,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,           	XK_F6,     spawn,          SHCMD("mpc stop") },
 	{ MODKEY,           		XK_F5,     spawn,          SHCMD("mpc prev") },
 	{ MODKEY,           		XK_F7,     spawn,          SHCMD("mpc next") },
-	{ MODKEY,                     	XK_Print,  spawn,          SHCMD("maim > \"~/screenshot_$(date -I | tr - _)\"") },
-	{ MODKEY,           		XK_grave,  spawn,          SHCMD("maim -s > \"~/screenshot_$(date -I | tr - _)\"") },
+	{ MODKEY,                     	XK_Print,  spawn,          SHCMD("maim ~/screenshot_$(date +%d_%m_%Y).png") },
+	{ MODKEY,           		XK_grave,  spawn,          SHCMD("maim -s ~/screenshot_$(date +%d_%m_%Y).png") },
 	{ MODKEY|ShiftMask,           	XK_p,  	   spawn,          SHCMD("shutdown now") },
 	{ MODKEY|ShiftMask,           	XK_r,  	   spawn,          SHCMD("reboot") },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
