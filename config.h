@@ -123,9 +123,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Tab,    zoom,           {0} },
 	//{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_BackSpace,killclient,   {0} },
-	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[0]} },
+	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[1]} },
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_s,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_u,      setlayout,      {.v = &layouts[4]} },
 	{ MODKEY|ShiftMask,             XK_equal,  togglegaps,     {0} },
@@ -139,8 +139,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
 	{ MODKEY,           		XK_bracketright,  	   shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
 	{ MODKEY,           		XK_bracketleft,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_braceright,      shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_braceleft,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_bracketright,      shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_bracketleft,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
