@@ -65,9 +65,9 @@ static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "D[]",      deck },	/* first entry is default */
+	{ "[M]",      monocle },	/* first entry is default */
+	{ "D[]",      deck },
 	{ "[]=",      tile },    
-	{ "[M]",      monocle },
 	{ "TTT",      bstack },
 	{ "B[]",      bstackdeck },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
@@ -88,25 +88,26 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon };
-static const char *termcmd[]  = { "st", NULL };
-static const char *browsercmd[]  = { "qutebrowser", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
+static const char *browsercmd[]  = { "brave", NULL };
 
 #include "movestack.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
+	{ MODKEY,                       XK_e,      spawn,          SHCMD("neovide") },
 	{ MODKEY,                     	XK_space,  spawn,          SHCMD("keymapswitch") },
 	{ MODKEY,                     	XK_F1,     spawn,          SHCMD("pamixer --toggle-mute; kill -49 $(pidof dwmblocks)") },
 	{ MODKEY,                     	XK_F2,     spawn,          SHCMD("pamixer --decrease 2; kill -49 $(pidof dwmblocks)") },
 	{ MODKEY,                     	XK_F3,     spawn,          SHCMD("pamixer --increase 2; kill -49 $(pidof dwmblocks)") },
 	{ MODKEY|ShiftMask,           	XK_F3,     spawn,          SHCMD("pamixer --set-volume 100; kill -49 $(pidof dwmblocks)") },
-	{ MODKEY,           		XK_F6,     spawn,          SHCMD("mpc toggle") },
-	{ MODKEY|ShiftMask,           	XK_F6,     spawn,          SHCMD("mpc stop") },
-	{ MODKEY,           		XK_F5,     spawn,          SHCMD("mpc prev") },
-	{ MODKEY,           		XK_F7,     spawn,          SHCMD("mpc next") },
-	{ MODKEY,                     	XK_Print,  spawn,          SHCMD("maim ~/screenshot_$(date +%d_%m_%Y).png") },
-	{ MODKEY,           		XK_grave,  spawn,          SHCMD("maim -s ~/screenshot_$(date +%d_%m_%Y).png") },
+	//{ MODKEY,           		XK_F6,     spawn,          SHCMD("mpc toggle") },
+	//{ MODKEY|ShiftMask,           	XK_F6,     spawn,          SHCMD("mpc stop") },
+	//{ MODKEY,           		XK_F5,     spawn,          SHCMD("mpc prev") },
+	//{ MODKEY,           		XK_F7,     spawn,          SHCMD("mpc next") },
+	{ MODKEY,                     	XK_Print,  spawn,          SHCMD("maim ~/screenshot_$(date +%d_%m_%Y_%H%M%S).png") },
+	{ MODKEY,           		XK_grave,  spawn,          SHCMD("maim -s ~/screenshot_$(date +%d_%m_%Y_%H%M%S).png") },
 	{ MODKEY|ShiftMask,           	XK_p,  	   spawn,          SHCMD("shutdown now") },
 	{ MODKEY|ShiftMask,           	XK_r,  	   spawn,          SHCMD("reboot") },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
@@ -121,7 +122,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_Tab,    zoom,           {0} },
 	//{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,                       XK_BackSpace,killclient,   {0} },
+	{ MODKEY|ShiftMask,             XK_BackSpace,killclient,   {0} },
 	{ MODKEY,                       XK_d,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
@@ -136,10 +137,10 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,           		XK_o,  	   shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
-	{ MODKEY,           		XK_i,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_o,      shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
-	{ MODKEY|ShiftMask, 		XK_i,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY,           		XK_bracketright,  	   shiftview,      { .ui = SHIFT_RIGHT | SHIFT_VIEW } },
+	{ MODKEY,           		XK_bracketleft,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_braceright,      shiftview,      { .ui = SHIFT_RIGHT | SHIFT_TAG | SHIFT_VIEW} },
+	{ MODKEY|ShiftMask, 		XK_braceleft,      shiftview,      { .ui = SHIFT_LEFT | SHIFT_TAG | SHIFT_VIEW} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
